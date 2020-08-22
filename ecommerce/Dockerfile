@@ -1,21 +1,18 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Get base SDK Image from Microsoft
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
+WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
+#Copy the CSPROJ file and restore any dependencies
+COPY *.csproj ./
+RUN dotnet restore
+
+#Copy the project files and build our release
+COPY . ./
+RUN dotnet publish -c Release -o out
+
+#Generate runtime image
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
 EXPOSE 80
-
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
-WORKDIR /src
-COPY ["ecommerce/ecommerce.csproj", "ecommerce/"]
-RUN dotnet restore "ecommerce/ecommerce.csproj"
-COPY . .
-WORKDIR "/src/ecommerce"
-RUN dotnet build "ecommerce.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "ecommerce.csproj" -c Release -o /app/publish
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "ecommerce.dll"]
