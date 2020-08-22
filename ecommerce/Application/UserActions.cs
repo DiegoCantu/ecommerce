@@ -82,8 +82,32 @@ namespace ecommerce.Application
             return user;
         }
 
+        public async Task<ActionResult> Login(Login login)
+        {
+            if (login == null)
+            {
+                return BadRequest("Solicitud de cliente no válida");
+            }
+            string dbpass = await _context.User.Where(x => x.Email == login.Email).Select(x => x.Password).FirstOrDefaultAsync();
+            if (!string.IsNullOrEmpty(dbpass))
+            {
+                if (Cryptography.VerifyPassword(dbpass, login.Password))
+                {
+                    return Ok(new { Token = JWT.GetToken() });
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
         private bool Exists(int id)
-        { 
+        {
             return _context.User.Any(e => e.IdUser == id);
         }
 

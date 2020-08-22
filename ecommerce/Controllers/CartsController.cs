@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ecommerce.Models;
 using ecommerce.Persistence;
 using ecommerce.Application;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ecommerce.Controllers
 {
@@ -19,8 +20,8 @@ namespace ecommerce.Controllers
             _cart = new CartsActions(_context);
         }
 
-        // GET: api/Carts
-        [HttpGet]
+        // GET: api/Carts | JWT
+        [HttpGet, Authorize]
         public async Task<ActionResult<IEnumerable<Cart>>> GetCart()
         {
             return await _cart.Get();

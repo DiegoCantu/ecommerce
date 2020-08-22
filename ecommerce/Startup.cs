@@ -18,11 +18,12 @@ namespace ecommerce
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Get database connection string:
-            GlobalVariables.ConnectionString = Configuration.GetConnectionString("ConexionDatabase");
-            //Custom Methods
+            // Set Global Variables (Connection String Database, JWT, etc):
+            GlobalVariables.Setter(Configuration);
+            //Custom Methods:
             ServiceExtensions.AddController(services);
             ServiceExtensions.AddDbContext(services);
+            ServiceExtensions.AddJWT(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,18 +34,25 @@ namespace ecommerce
                 app.UseDeveloperExceptionPage();
             }
 
-            //Custom Method:
+            // { Custom Method:
             ConfigureExtensions.GlobalExceptions(app);
+            // }
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            // { JWT:
+            app.UseAuthentication();
+            // }
 
+            // { CORS:
+            app.UseCors("EnableCORS");
+            // }
+
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-
         }
     }
 }
