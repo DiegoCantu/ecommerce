@@ -21,7 +21,7 @@ namespace ecommerce.Models
         public ICollection<CartDetail> CartDetails { get; set; }
     }
 
-    public class CartValidation : AbstractValidator<Cart>
+    internal class CartValidation : AbstractValidator<Cart>
     {
         public CartValidation()
         {

@@ -19,7 +19,7 @@ namespace ecommerce.Models
         public DateTime? CreateDate { get; set; } = DateTime.Now;
     }
 
-    public class PurchaseValidation : AbstractValidator<Purchase>
+    internal class PurchaseValidation : AbstractValidator<Purchase>
     {
         public PurchaseValidation()
         {

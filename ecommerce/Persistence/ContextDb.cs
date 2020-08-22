@@ -21,5 +21,7 @@ namespace ecommerce.Persistence
         public DbSet<CartDetail> CartDetail { get; set; }
         public DbSet<Purchase> Purchase { get; set; }
         public DbSet<Log> Log { get; set; }
+        public DbSet<ecommerce.Models.Address> Address { get; set; }
+        public DbSet<ecommerce.Models.Card> Card { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace ecommerce.Models
         public DateTime? CreateDate { get; set; } = DateTime.Now;
     }
 
-    public class CardValidation : AbstractValidator<Card>
+    internal class CardValidation : AbstractValidator<Card>
     {
         public CardValidation()
         {

@@ -20,7 +20,7 @@ namespace ecommerce.Models
         public int Quantity { get; set; }
     }
 
-    public class CartDetailValidation : AbstractValidator<CartDetail>
+    internal class CartDetailValidation : AbstractValidator<CartDetail>
     {
         public CartDetailValidation()
         {

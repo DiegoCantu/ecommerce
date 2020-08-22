@@ -15,6 +15,7 @@ namespace ecommerce.Models
         public string Username { get; set; }
         //Primary Key
         [Key]
+        [Required]
         public string Email { get; set; }
         public string Password { get; set; }
         public DateTime? CreateDate { get; set; } = DateTime.Now;
@@ -23,7 +24,7 @@ namespace ecommerce.Models
         public ICollection<Card> Cards { get; set; } 
     }
 
-    public class UserValidation : AbstractValidator<User>
+    internal class UserValidation : AbstractValidator<User>
     {
         public UserValidation()
         {

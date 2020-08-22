@@ -21,7 +21,7 @@ namespace ecommerce.Models
         public DateTime? CreateDate { get; set; } = DateTime.Now;
     }
 
-    public class CommentValidation : AbstractValidator<Comment>
+    internal class CommentValidation : AbstractValidator<Comment>
     {
         public CommentValidation() 
         {

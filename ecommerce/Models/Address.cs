@@ -25,7 +25,7 @@ namespace ecommerce.Models
         public DateTime? CreateDate { get; set; } = DateTime.Now;
     }
 
-    public class AddressValidation : AbstractValidator<Address>
+    internal class AddressValidation : AbstractValidator<Address>
     {
         public AddressValidation()
         {

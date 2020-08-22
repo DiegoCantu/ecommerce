@@ -1,4 +1,5 @@
-﻿using ecommerce.Models;
+﻿using ecommerce.Helper;
+using ecommerce.Models;
 using Npgsql;
 using System;
 
@@ -28,9 +29,9 @@ namespace ecommerce.Application
             {
                 cmd.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                ELog.Save(log, ex);
             } 
             finally
             {

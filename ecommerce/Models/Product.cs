@@ -29,7 +29,7 @@ namespace ecommerce.Models
         public ICollection<Comment> Comments { get; set; }
     }
 
-    public class ProductValidation : AbstractValidator<Product>
+    internal class ProductValidation : AbstractValidator<Product>
     {
         public ProductValidation()
         {

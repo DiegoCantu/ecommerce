@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Log\Errors\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 
