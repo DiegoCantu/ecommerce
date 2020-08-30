@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,24 +7,21 @@ namespace ecommerce.Models
 {
     public class Cart
     {
-        //Primary Key Auto-Increment
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IdCart { get; set; }
-        //Foreign key for User
-        public int IdUser { get; set; }
-        public User User { get; set; }
-        //Columns
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
-        // Reference to CartDetail table
-        public ICollection<CartDetail> CartDetails { get; set; }
-    }
-
-    internal class CartValidation : AbstractValidator<Cart>
-    {
-        public CartValidation()
+        public Cart()
         {
-            RuleFor(x => x.IdUser).NotEmpty();
+            CartDetail = new HashSet<CartDetail>();
         }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public int IdCart { get; set; }
+        public string Email { get; set; }
+        public bool Bought { get; set; }
+        public decimal Total { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
+
+        public virtual User User { get; set; }
+        public virtual Purchase Purchase { get; set; }
+        public virtual ICollection<CartDetail> CartDetail { get; set; }
     }
 }

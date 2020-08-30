@@ -15,6 +15,7 @@ namespace ecommerce.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("public")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "3.1.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
@@ -32,11 +33,11 @@ namespace ecommerce.Migrations
                     b.Property<string>("City")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("IdUser")
-                        .HasColumnType("integer");
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
 
                     b.Property<bool>("InUse")
                         .HasColumnType("boolean");
@@ -53,12 +54,9 @@ namespace ecommerce.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("text");
 
-                    b.Property<string>("UserEmail")
-                        .HasColumnType("text");
-
                     b.HasKey("IdAddress");
 
-                    b.HasIndex("UserEmail");
+                    b.HasIndex("Email");
 
                     b.ToTable("Address");
                 });
@@ -73,14 +71,14 @@ namespace ecommerce.Migrations
                     b.Property<string>("CardName")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
 
                     b.Property<string>("ExpireDate")
                         .HasColumnType("text");
-
-                    b.Property<int>("IdUser")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("InUse")
                         .HasColumnType("boolean");
@@ -88,15 +86,12 @@ namespace ecommerce.Migrations
                     b.Property<string>("NumberCard")
                         .HasColumnType("text");
 
-                    b.Property<string>("UserEmail")
-                        .HasColumnType("text");
-
                     b.Property<string>("UsernameCard")
                         .HasColumnType("text");
 
                     b.HasKey("IdCard");
 
-                    b.HasIndex("UserEmail");
+                    b.HasIndex("Email");
 
                     b.ToTable("Card");
                 });
@@ -108,18 +103,21 @@ namespace ecommerce.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<bool>("Bought")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("IdUser")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UserEmail")
+                    b.Property<string>("Email")
                         .HasColumnType("text");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric");
 
                     b.HasKey("IdCart");
 
-                    b.HasIndex("UserEmail");
+                    b.HasIndex("Email");
 
                     b.ToTable("Cart");
                 });
@@ -131,16 +129,10 @@ namespace ecommerce.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<int?>("CartIdCart")
-                        .HasColumnType("integer");
-
                     b.Property<int>("IdCart")
                         .HasColumnType("integer");
 
                     b.Property<int>("IdProduct")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ProductIdProduct")
                         .HasColumnType("integer");
 
                     b.Property<int>("Quantity")
@@ -148,11 +140,31 @@ namespace ecommerce.Migrations
 
                     b.HasKey("IdCartDetail");
 
-                    b.HasIndex("CartIdCart");
-
-                    b.HasIndex("ProductIdProduct");
+                    b.HasIndex("IdCart");
 
                     b.ToTable("CartDetail");
+                });
+
+            modelBuilder.Entity("ecommerce.Models.CartDetailProductAuxiliaryNn", b =>
+                {
+                    b.Property<int>("IdCartDetailProduct")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("IdCartDetail")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IdProduct")
+                        .HasColumnType("integer");
+
+                    b.HasKey("IdCartDetailProduct");
+
+                    b.HasIndex("IdCartDetail");
+
+                    b.HasIndex("IdProduct");
+
+                    b.ToTable("CartDetailProductAuxiliaryNn");
                 });
 
             modelBuilder.Entity("ecommerce.Models.Category", b =>
@@ -162,7 +174,7 @@ namespace ecommerce.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
@@ -180,7 +192,7 @@ namespace ecommerce.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("IdProduct")
@@ -192,15 +204,12 @@ namespace ecommerce.Migrations
                     b.Property<string>("Post")
                         .HasColumnType("text");
 
-                    b.Property<int?>("ProductIdProduct")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("numeric");
 
                     b.HasKey("IdComment");
 
-                    b.HasIndex("ProductIdProduct");
+                    b.HasIndex("IdProduct");
 
                     b.ToTable("Comment");
                 });
@@ -212,17 +221,17 @@ namespace ecommerce.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
 
                     b.Property<string>("HResult")
                         .HasColumnType("text");
 
                     b.Property<string>("HelpLink")
                         .HasColumnType("text");
-
-                    b.Property<int?>("IdUser")
-                        .HasColumnType("integer");
 
                     b.Property<string>("InnerException")
                         .HasColumnType("text");
@@ -251,10 +260,7 @@ namespace ecommerce.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<int?>("CategoryIdCategory")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
@@ -266,11 +272,14 @@ namespace ecommerce.Migrations
                     b.Property<string>("Img")
                         .HasColumnType("text");
 
+                    b.Property<bool>("ImgApproved")
+                        .HasColumnType("boolean");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Sku")
                         .HasColumnType("text");
@@ -286,7 +295,7 @@ namespace ecommerce.Migrations
 
                     b.HasKey("IdProduct");
 
-                    b.HasIndex("CategoryIdCategory");
+                    b.HasIndex("IdCategory");
 
                     b.ToTable("Product");
                 });
@@ -298,21 +307,21 @@ namespace ecommerce.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<int?>("CartIdCart")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
 
                     b.Property<int>("IdCart")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("Total")
-                        .HasColumnType("numeric");
-
                     b.HasKey("IdPurchase");
 
-                    b.HasIndex("CartIdCart");
+                    b.HasIndex("Email");
+
+                    b.HasIndex("IdCart")
+                        .IsUnique();
 
                     b.ToTable("Purchase");
                 });
@@ -322,7 +331,7 @@ namespace ecommerce.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("CreateDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("IdUser")
@@ -333,9 +342,6 @@ namespace ecommerce.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("text");
 
-                    b.Property<string>("Username")
-                        .HasColumnType("text");
-
                     b.HasKey("Email");
 
                     b.ToTable("User");
@@ -344,54 +350,77 @@ namespace ecommerce.Migrations
             modelBuilder.Entity("ecommerce.Models.Address", b =>
                 {
                     b.HasOne("ecommerce.Models.User", "User")
-                        .WithMany("Addresses")
-                        .HasForeignKey("UserEmail");
+                        .WithMany("Address")
+                        .HasForeignKey("Email");
                 });
 
             modelBuilder.Entity("ecommerce.Models.Card", b =>
                 {
                     b.HasOne("ecommerce.Models.User", "User")
-                        .WithMany("Cards")
-                        .HasForeignKey("UserEmail");
+                        .WithMany("Card")
+                        .HasForeignKey("Email");
                 });
 
             modelBuilder.Entity("ecommerce.Models.Cart", b =>
                 {
                     b.HasOne("ecommerce.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserEmail");
+                        .WithMany("Cart")
+                        .HasForeignKey("Email");
                 });
 
             modelBuilder.Entity("ecommerce.Models.CartDetail", b =>
                 {
                     b.HasOne("ecommerce.Models.Cart", "Cart")
-                        .WithMany("CartDetails")
-                        .HasForeignKey("CartIdCart");
+                        .WithMany("CartDetail")
+                        .HasForeignKey("IdCart")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ecommerce.Models.CartDetailProductAuxiliaryNn", b =>
+                {
+                    b.HasOne("ecommerce.Models.CartDetail", "CartDetail")
+                        .WithMany("CartDetailProductAuxiliaryNn")
+                        .HasForeignKey("IdCartDetail")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ecommerce.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductIdProduct");
+                        .WithMany("CartDetailProductAuxiliaryNn")
+                        .HasForeignKey("IdProduct")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ecommerce.Models.Comment", b =>
                 {
                     b.HasOne("ecommerce.Models.Product", "Product")
-                        .WithMany("Comments")
-                        .HasForeignKey("ProductIdProduct");
+                        .WithMany("Comment")
+                        .HasForeignKey("IdProduct")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ecommerce.Models.Product", b =>
                 {
                     b.HasOne("ecommerce.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryIdCategory");
+                        .WithMany("Product")
+                        .HasForeignKey("IdCategory")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ecommerce.Models.Purchase", b =>
                 {
+                    b.HasOne("ecommerce.Models.User", "User")
+                        .WithMany("Purchase")
+                        .HasForeignKey("Email");
+
                     b.HasOne("ecommerce.Models.Cart", "Cart")
-                        .WithMany()
-                        .HasForeignKey("CartIdCart");
+                        .WithOne("Purchase")
+                        .HasForeignKey("ecommerce.Models.Purchase", "IdCart")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

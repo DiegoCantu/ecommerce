@@ -1,0 +1,12 @@
+﻿DROP TABLE public."Address";
+DROP TABLE public."Card";
+DROP TABLE public."Comment";
+DROP TABLE public."Log";
+DROP TABLE public."CartDetailProductAuxiliaryNn";
+DROP TABLE public."Product";
+DROP TABLE public."CartDetail";
+DROP TABLE public."Category";
+DROP TABLE public."Purchase";
+DROP TABLE public."Cart";
+DROP TABLE public."User";
+DROP TABLE public."__EFMigrationsHistory";

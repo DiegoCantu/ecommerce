@@ -3,15 +3,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ecommerce.Persistence
 {
-    public class ContextDb: DbContext
+    public class ContextDb : DbContext
     {
-        //Keyless
+        public ContextDb(DbContextOptions<ContextDb> options) : base(options) { }
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{   //Keyless:
+        //    //modelBuilder.Entity<Class>().HasNoKey().ToView(null);
+        //}
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Class>().HasNoKey().ToView(null);
+            base.OnModelCreating(Relationship.Create(modelBuilder));
         }
 
-        public ContextDb(DbContextOptions<ContextDb> options): base(options) { }
         //Create tables.
         public DbSet<User> User { get; set; }
         public DbSet<Product> Product { get; set; }
@@ -21,7 +25,8 @@ namespace ecommerce.Persistence
         public DbSet<CartDetail> CartDetail { get; set; }
         public DbSet<Purchase> Purchase { get; set; }
         public DbSet<Log> Log { get; set; }
-        public DbSet<ecommerce.Models.Address> Address { get; set; }
-        public DbSet<ecommerce.Models.Card> Card { get; set; }
+        public DbSet<Address> Address { get; set; }
+        public DbSet<Card> Card { get; set; }
+        public DbSet<CartDetailProductAuxiliaryNn> CartDetailProductAuxiliaryNn { get; set; }
     }
 }

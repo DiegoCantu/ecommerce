@@ -1,0 +1,34 @@
+﻿*-CODE FIRST APPROACH:
+
+--Install tool for migrations:
+*dotnet tool install --global dotnet-ef --version 3.1.7
+
+--Upadte tool migration to another version:
+*dotnet tool update --global dotnet-ef --version 3.1.<AnotherNumber>
+
+--Create local migrations:
+*dotnet ef migrations add InitialMigration
+
+--Remove the latest migration:
+You should always use commands to remove a migration instead of simply deleting the migration code file,
+otherwise the snapshot and migrations will fall out of sync with eachother. Then future migrations will 
+be based on a model that is incorrect. Nevertheless, the remove command will recognise if migration files 
+have been deleted and will revert the snapshot accordingly.
+If you need to remove a migration that was generated before the most recent one, you must remove all sunsequent
+migrations first, then adjust the model and then create a new migration to cater for the changes:
+*dotnet ef migrations remove
+
+--Create-Upload migration to database:
+*dotnet ef database update
+
+--Upload-Update specific migration to database:
+*dotnet ef database update NumberMigration_MigrationName
+
+*-DATABASE FIRST APPROACH:
+
+In Visual Studio, select menu Tools -> NuGet Package Manger -> Package Manger Console and run the following command:
+(The entity framework nuget package needs to be installed)
+PostgreSQl:
+dotnet ef dbcontext scaffold "Server=127.0.0.1;Database=ecommerceDatabaseFirst;Port=5432;User Id=postgres;Password=postgress12;" Npgsql.EntityFrameworkCore.PostgreSQL -o Models -f
+SQL:
+dotnet ef dbcontext scaffold "Data Source=localhost;Initial Catalog=ecommerceDatabaseFirst;User ID=sa;Password=sqlserver2012;" Microsoft.EntityFrameworkCore.SqlServer -o Models -f

@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using ecommerce.Models;
 using ecommerce.Persistence;
 using ecommerce.Application;
+using AutoMapper;
+using ecommerce.DTOs.Response;
+using ecommerce.DTOs.Request;
 
 namespace ecommerce.Controllers
 {
@@ -11,45 +13,43 @@ namespace ecommerce.Controllers
     [ApiController]
     public class CardsController : ControllerBase
     {
-        private readonly ContextDb _context;
         private readonly CardActions _cards;
-        public CardsController(ContextDb context)
+        public CardsController(ContextDb context, IMapper mapper)
         {
-            _context = context;
-            _cards = new CardActions(_context);
+            _cards = new CardActions(context, mapper);
         }
 
         // GET: api/Cards
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Card>>> GetCard()
+        public async Task<ActionResult<IEnumerable<CardResponse>>> GetCard()
         {
             return await _cards.Get();
         }
 
         // GET: api/Cards/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Card>> GetCard(int id)
+        public async Task<ActionResult<CardResponse>> GetCard(int id)
         {
             return await _cards.GetById(id);
         }
 
         // PUT: api/Cards/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCard(int id, Card card)
+        public async Task<IActionResult> PutCard(int id, CardRequest card)
         {
             return await _cards.Put(id, card);
         }
 
         // POST: api/Cards
         [HttpPost]
-        public async Task<ActionResult<Card>> PostCard(Card card)
+        public async Task<ActionResult<CardResponse>> PostCard(CardRequest card)
         {
             return await _cards.Post(card) ;
         }
 
         // DELETE: api/Cards/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Card>> DeleteCard(int id)
+        public async Task<ActionResult<CardResponse>> DeleteCard(int id)
         {
             return await _cards.Delete(id);
         }

@@ -7,7 +7,7 @@ namespace ecommerce.Helper
 {
     public class ELog
     {
-        public static void Save(object obj, Exception ex)
+        public static void Save(object obj, Exception ex, string sp)
         {
             try
             {
@@ -22,7 +22,7 @@ namespace ecommerce.Helper
                 StackTrace stacktrace = new StackTrace();
                 var message = JsonConvert.SerializeObject(obj);
                 sw.WriteLine(message);
-                sw.WriteLine(stacktrace.GetFrame(1).GetMethod().Name + " - " + ex.Message);
+                sw.WriteLine(stacktrace.GetFrame(1).GetMethod().Name + " - " + ex.Message + " - " + sp);
                 sw.WriteLine("");
 
                 sw.Flush();

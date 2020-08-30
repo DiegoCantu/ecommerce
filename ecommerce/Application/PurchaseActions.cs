@@ -1,4 +1,7 @@
-﻿using ecommerce.Models;
+﻿using AutoMapper;
+using ecommerce.DTOs.Request;
+using ecommerce.DTOs.Response;
+using ecommerce.Models;
 using ecommerce.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,17 +14,29 @@ namespace ecommerce.Application
     public class PurchaseActions : ControllerBase
     {
         private readonly ContextDb _context;
-        public PurchaseActions(ContextDb context)
+        private readonly IMapper _mapper;
+        public PurchaseActions(ContextDb context,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<ActionResult<IEnumerable<Purchase>>> Get()
+        public async Task<ActionResult<IEnumerable<PurchaseResponse>>> Get()
         {
-            return await _context.Purchase.ToListAsync();
+            var purchaseModel = await _context.Purchase.ToListAsync();
+            // Model to Dto:
+            var purchaseDto = _mapper.Map<List<Purchase>, List<PurchaseResponse>>(purchaseModel);
+            // Get Carts:
+            CartActions cartActions = new CartActions(_context, _mapper);
+            foreach (var purchase in purchaseDto)
+            {
+                var cart = await cartActions.GetById(purchase.IdCart);
+                purchase.Cart = cart.Value;
+            }
+            return purchaseDto;
         }
 
-        public async Task<ActionResult<Purchase>> GetByid(int id)
+        public async Task<ActionResult<PurchaseResponse>> GetByid(int id)
         {
             var purchase = await _context.Purchase.FindAsync(id);
 
@@ -29,18 +44,44 @@ namespace ecommerce.Application
             {
                 return NotFound();
             }
-
-            return purchase;
+            // Model to Dto:
+            var purchaseDto = _mapper.Map<Purchase, PurchaseResponse>(purchase);
+            // Get Cart:
+            CartActions cartActions = new CartActions(_context, _mapper);
+            var cart = await cartActions.GetById(purchase.IdCart);
+            purchaseDto.Cart = cart.Value;
+            return purchaseDto;
         }
 
-        public async Task<IActionResult> Put(int id, Purchase purchase)
+        public async Task<ActionResult<IEnumerable<PurchaseResponse>>> GetByEmail(string email)
+        {
+            var purchaseModel = await _context.Purchase.Where(x => x.Email == email).ToListAsync();
+            // Model to Dto:
+            var purchaseDto = _mapper.Map<List<Purchase>, List<PurchaseResponse>>(purchaseModel);
+            // Get Carts:
+            CartActions cartActions = new CartActions(_context, _mapper);
+            foreach (var purchase in purchaseDto)
+            {
+                var cart = await cartActions.GetById(purchase.IdCart);
+                purchase.Cart = cart.Value;
+            }
+            return purchaseDto;
+        }
+
+        public async Task<IActionResult> Put(int id, PurchaseRequest purchase)
         {
             if (id != purchase.IdPurchase)
             {
                 return BadRequest();
             }
-
-            _context.Entry(purchase).State = EntityState.Modified;
+            // Dto to Model:
+            Purchase purchaseModel = new Purchase()
+            {
+                IdPurchase = purchase.IdPurchase,
+                Email = purchase.Email,
+                IdCart = purchase.IdCart
+            };
+            _context.Entry(purchaseModel).State = EntityState.Modified;
 
             try
             {
@@ -61,15 +102,31 @@ namespace ecommerce.Application
             return NoContent();
         }
 
-        public async Task<ActionResult<Purchase>> Post(Purchase purchase)
+        public async Task<ActionResult<PurchaseResponse>> Post(PurchaseRequest purchase)
         {
-            _context.Purchase.Add(purchase);
+            // Dto to Model:
+            Purchase purchaseModel = new Purchase()
+            {
+                Email = purchase.Email,
+                IdCart = purchase.IdCart
+            };
+            _context.Purchase.Add(purchaseModel);
             await _context.SaveChangesAsync();
+            purchase.IdPurchase = purchaseModel.IdPurchase;
+
+            await UpdateCart(purchase.IdCart);
 
             return CreatedAtAction("GetPurchase", new { id = purchase.IdPurchase }, purchase);
         }
 
-        public async Task<ActionResult<Purchase>> Delete(int id)
+        private async Task UpdateCart(int idCart)
+        {
+            // Update status cart:
+            CartActions cartActions = new CartActions(_context, _mapper);
+            await cartActions.UpdateById(idCart);
+        }
+
+        public async Task<ActionResult<PurchaseResponse>> Delete(int id)
         {
             var purchase = await _context.Purchase.FindAsync(id);
             if (purchase == null)
@@ -79,8 +136,9 @@ namespace ecommerce.Application
 
             _context.Purchase.Remove(purchase);
             await _context.SaveChangesAsync();
-
-            return purchase;
+            // Model to Dto:
+            var purchaseDto = _mapper.Map<Purchase, PurchaseResponse>(purchase);
+            return purchaseDto;
         }
 
         private bool Exists(int id)

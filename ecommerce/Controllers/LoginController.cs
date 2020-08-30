@@ -1,5 +1,7 @@
-﻿using ecommerce.Application;
-using ecommerce.Models;
+﻿using AutoMapper;
+using ecommerce.Application;
+using ecommerce.DTOs.Request;
+using ecommerce.DTOs.Response;
 using ecommerce.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -10,17 +12,15 @@ namespace ecommerce.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        private readonly ContextDb _context;
         private readonly UserActions _users;
-        public LoginController(ContextDb context)
+        public LoginController(ContextDb context,IMapper mapper)
         {
-            _context = context;
-            _users = new UserActions(_context);
+            _users = new UserActions(context, mapper);
         }
 
         // POST: api/Login
         [HttpPost]
-        public async Task<ActionResult> Login([FromBody] Login login)
+        public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest login)
         {
             return await _users.Login(login);
         }

@@ -1,4 +1,7 @@
-﻿using ecommerce.Models;
+﻿using AutoMapper;
+using ecommerce.DTOs.Request;
+using ecommerce.DTOs.Response;
+using ecommerce.Models;
 using ecommerce.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,36 +14,96 @@ namespace ecommerce.Application
     public class CardActions : ControllerBase
     {
         private readonly ContextDb _context;
-        public CardActions(ContextDb context)
+        private readonly IMapper _mapper;
+        public CardActions(ContextDb context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<ActionResult<IEnumerable<Card>>> Get()
+        public async Task<ActionResult<IEnumerable<CardResponse>>> Get()
         {
-            return await _context.Card.ToListAsync();
+            var cardModel = await _context.Card.ToListAsync();
+            List<CardResponse> cardDtos = new List<CardResponse>();
+            foreach (var model in cardModel)
+            {
+                CardResponse cardDto = new CardResponse
+                {
+                    CardName = model.CardName,
+                    CreateDate = model.CreateDate,
+                    Email = model.Email,
+                    ExpireDate = model.ExpireDate,
+                    IdCard = model.IdCard,
+                    InUse = model.InUse,
+                    NumberCard = model.NumberCard,
+                    UsernameCard = model.UsernameCard
+                };
+                cardDtos.Add(cardDto);
+            }
+            return cardDtos;
         }
 
-        public async Task<ActionResult<Card>> GetById(int id)
+        public async Task<ActionResult<CardResponse>> GetById(int id)
         {
             var card = await _context.Card.FindAsync(id);
-
             if (card == null)
             {
                 return NotFound();
             }
-
-            return card;
+            CardResponse cardDto = new CardResponse
+            {
+                CardName = card.CardName,
+                CreateDate = card.CreateDate,
+                Email = card.Email,
+                ExpireDate = card.ExpireDate,
+                IdCard = card.IdCard,
+                InUse = card.InUse,
+                NumberCard = card.NumberCard,
+                UsernameCard = card.UsernameCard
+            };
+            return cardDto;
         }
 
-        public async Task<IActionResult> Put(int id, Card card)
+        public async Task<ActionResult<IEnumerable<CardResponse>>> GetByEmail(string email)
+        {
+            var cardModel = await _context.Card.Where(x => x.Email == email).ToListAsync();
+            List<CardResponse> cardDtos = new List<CardResponse>();
+            foreach (var model in cardModel)
+            {
+                CardResponse cardDto = new CardResponse
+                {
+                    CardName = model.CardName,
+                    CreateDate = model.CreateDate,
+                    Email = model.Email,
+                    ExpireDate = model.ExpireDate,
+                    IdCard = model.IdCard,
+                    InUse = model.InUse,
+                    NumberCard = model.NumberCard,
+                    UsernameCard = model.UsernameCard
+                };
+                cardDtos.Add(cardDto);
+            }
+            return cardDtos;
+        }
+
+        public async Task<IActionResult> Put(int id, CardRequest card)
         {
             if (id != card.IdCard)
             {
                 return BadRequest();
             }
-
-            _context.Entry(card).State = EntityState.Modified;
+            // Dto to Model:
+            Card cardModel = new Card()
+            {
+                IdCard = card.IdCard,
+                CardName = card.CardName,
+                Email = card.Email,
+                ExpireDate = card.ExpireDate,
+                InUse = card.InUse,
+                NumberCard = card.NumberCard,
+                UsernameCard = card.UsernameCard,
+            };
+            _context.Entry(cardModel).State = EntityState.Modified;
 
             try
             {
@@ -61,15 +124,25 @@ namespace ecommerce.Application
             return NoContent();
         }
 
-        public async Task<ActionResult<Card>> Post(Card card)
+        public async Task<ActionResult<CardResponse>> Post(CardRequest card)
         {
-            _context.Card.Add(card);
+            // Dto to Model:
+            Card cardModel = new Card()
+            {
+                CardName = card.CardName,
+                Email = card.Email,
+                ExpireDate = card.ExpireDate,
+                InUse = card.InUse,
+                NumberCard = card.NumberCard,
+                UsernameCard = card.UsernameCard,
+            };
+            _context.Card.Add(cardModel);
             await _context.SaveChangesAsync();
-
+            card.IdCard = cardModel.IdCard;
             return CreatedAtAction("GetCard", new { id = card.IdCard }, card);
         }
 
-        public async Task<ActionResult<Card>> Delete(int id)
+        public async Task<ActionResult<CardResponse>> Delete(int id)
         {
             var card = await _context.Card.FindAsync(id);
             if (card == null)
@@ -79,8 +152,18 @@ namespace ecommerce.Application
 
             _context.Card.Remove(card);
             await _context.SaveChangesAsync();
-
-            return card;
+            CardResponse cardDto = new CardResponse
+            {
+                CardName = card.CardName,
+                CreateDate = card.CreateDate,
+                Email = card.Email,
+                ExpireDate = card.ExpireDate,
+                IdCard = card.IdCard,
+                InUse = card.InUse,
+                NumberCard = card.NumberCard,
+                UsernameCard = card.UsernameCard
+            };
+            return cardDto;
         }
 
         private bool Exists(int id)

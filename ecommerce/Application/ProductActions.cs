@@ -1,8 +1,13 @@
-﻿using ecommerce.Models;
+﻿using AutoMapper;
+using ecommerce.DTOs.Request;
+using ecommerce.DTOs.Response;
+using ecommerce.Helper;
+using ecommerce.Models;
 using ecommerce.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,17 +16,37 @@ namespace ecommerce.Application
     public class ProductActions : ControllerBase
     {
         private readonly ContextDb _context;
-        public ProductActions(ContextDb context)
+        private readonly IMapper _mapper;
+        public ProductActions(ContextDb context,IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<ActionResult<IEnumerable<Product>>> Get()
+        public async Task<ActionResult<IEnumerable<ProductResponse>>> Get()
         {
-            return await _context.Product.ToListAsync();
+            var productModel = await _context.Product.ToListAsync();
+            // Model to Dto:
+            var productDto = _mapper.Map<List<Product>, List<ProductResponse>>(productModel);
+            // Get Comments:
+            CommentActions commentActions = new CommentActions(_context,_mapper);
+            foreach (var product in productDto)
+            {
+                product.Comments = new Collection<CommentResponse>();
+                var commentsList = await commentActions.GetByIdProduct(product.IdProduct);
+                foreach (var comment in commentsList.Value)
+                {
+                    product.Comments.Add(comment);
+                }
+                if (product.ImgApproved == false)
+                {
+                    product.Img = "/waiting.png";
+                }
+            }
+            return productDto;
         }
 
-        public async Task<ActionResult<Product>> GetById(int id)
+        public async Task<ActionResult<ProductResponse>> GetById(int id)
         {
             var product = await _context.Product.FindAsync(id);
 
@@ -29,18 +54,40 @@ namespace ecommerce.Application
             {
                 return NotFound();
             }
-
-            return product;
+            // Model to Dto:
+            var productDto = _mapper.Map<Product, ProductResponse>(product);
+            // Get Comments:
+            CommentActions commentActions = new CommentActions(_context, _mapper);
+            productDto.Comments = new Collection<CommentResponse>();
+            var commentsList = await commentActions.GetByIdProduct(product.IdProduct);
+            foreach (var comment in commentsList.Value)
+            {
+                productDto.Comments.Add(comment);
+            }
+            return productDto;
         }
 
-        public async Task<IActionResult> Put(int id, Product product)
+        public async Task<IActionResult> Put(int id, ProductRequest product)
         {
             if (id != product.IdProduct)
             {
                 return BadRequest();
             }
-
-            _context.Entry(product).State = EntityState.Modified;
+            // Dto to Model:
+            Product productModel = new Product()
+            {
+                IdProduct = product.IdProduct,
+                Description = product.Description,
+                IdCategory = product.IdCategory,
+                Img = product.Img,
+                Rating = product.Rating,
+                Sku = product.Sku,
+                SubHeader = product.SubHeader,
+                Title = product.Title,
+                UnitPrice = product.UnitPrice,
+                ImgApproved = false
+            };
+            _context.Entry(productModel).State = EntityState.Modified;
 
             try
             {
@@ -61,15 +108,32 @@ namespace ecommerce.Application
             return NoContent();
         }
 
-        public async Task<ActionResult<Product>> Post(Product product)
+        public async Task<ActionResult<ProductResponse>> Post(ProductRequest product)
         {
-            _context.Product.Add(product);
+            // Dto to Model:
+            Product productModel = new Product()
+            {
+                Description = product.Description,
+                IdCategory = product.IdCategory,
+                Img = "/Images/" + product.Sku + ".png",
+                Rating = product.Rating,
+                Sku = product.Sku,
+                SubHeader = product.SubHeader,
+                Title = product.Title,
+                UnitPrice = product.UnitPrice,
+                Quantity = 1,
+                ImgApproved = false
+            };
+            _context.Product.Add(productModel);
             await _context.SaveChangesAsync();
+            product.IdProduct = productModel.IdProduct;
+
+            UploadImg.Save(product.Sku, product.Img, "ImgProducts");
 
             return CreatedAtAction("GetProduct", new { id = product.IdProduct }, product);
         }
 
-        public async Task<ActionResult<Product>> Delete(int id)
+        public async Task<ActionResult<ProductResponse>> Delete(int id)
         {
             var product = await _context.Product.FindAsync(id);
             if (product == null)
@@ -79,8 +143,9 @@ namespace ecommerce.Application
 
             _context.Product.Remove(product);
             await _context.SaveChangesAsync();
-
-            return product;
+            // Model to Dto:
+            var productDto = _mapper.Map<Product, ProductResponse>(product);
+            return productDto;
         }
 
         private bool Exists(int id)

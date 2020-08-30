@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,19 +7,17 @@ namespace ecommerce.Models
 {
     public class Category
     {
-        //Primary Key Auto-Increment
-        [Key]
+        public Category()
+        {
+            Product = new HashSet<Product>();
+        }
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
         public int IdCategory { get; set; }
         public string Name { get; set; }
-        public DateTime? CreateDate { get; set; } = DateTime.Now;
-    }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
 
-    internal class CategoryValidation : AbstractValidator<Category>
-    {
-        public CategoryValidation()
-        {
-            RuleFor(x => x.Name).NotEmpty();
-        }
+        public virtual ICollection<Product> Product { get; set; }
     }
 }

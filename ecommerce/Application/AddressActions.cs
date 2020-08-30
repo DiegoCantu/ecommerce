@@ -1,4 +1,7 @@
-﻿using ecommerce.Models;
+﻿using AutoMapper;
+using ecommerce.DTOs.Request;
+using ecommerce.DTOs.Response;
+using ecommerce.Models;
 using ecommerce.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,36 +14,61 @@ namespace ecommerce.Application
     public class AddressActions : ControllerBase
     {
         private readonly ContextDb _context;
-        public AddressActions(ContextDb context)
+        private readonly IMapper _mapper;
+        public AddressActions(ContextDb context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<ActionResult<IEnumerable<Address>>> Get()
+        public async Task<ActionResult<IEnumerable<AddressResponse>>> Get()
         {
-            return await _context.Address.ToListAsync();
+            var address = await _context.Address.ToListAsync();
+            // Model to Dto:
+            var addressDto = _mapper.Map<List<Address>, List<AddressResponse>>(address);
+            return addressDto;
         }
 
-        public async Task<ActionResult<Address>> GetById(int id)
+        public async Task<ActionResult<AddressResponse>> GetById(int id)
         {
             var address = await _context.Address.FindAsync(id);
-
             if (address == null)
             {
                 return NotFound();
             }
-
-            return address;
+            // Model to Dto:
+            var addressDto = _mapper.Map<Address, AddressResponse>(address);
+            return addressDto;
         }
 
-        public async Task<IActionResult> Put(int id, Address address)
+        public async Task<ActionResult<IEnumerable<AddressResponse>>> GetByEmail(string email)
+        {
+            var address = await _context.Address.Where(x => x.Email == email).ToListAsync();
+            // Model to Dto:
+            var addressDto = _mapper.Map<List<Address>, List<AddressResponse>>(address);
+            return addressDto;
+        }
+
+        public async Task<IActionResult> Put(int id, AddressRequest address)
         {
             if (id != address.IdAddress)
             {
                 return BadRequest();
             }
-
-            _context.Entry(address).State = EntityState.Modified;
+            // Dto to Model:
+            Address addressModel = new Address()
+            {
+                IdAddress = address.IdAddress,
+                BuyerName = address.BuyerName,
+                City = address.City,
+                Email = address.Email,
+                InUse = address.InUse,
+                Phone = address.Phone,
+                PostalCode = address.PostalCode,
+                State = address.State,
+                Street = address.Street
+            };
+            _context.Entry(addressModel).State = EntityState.Modified;
 
             try
             {
@@ -61,26 +89,38 @@ namespace ecommerce.Application
             return NoContent();
         }
 
-        public async Task<ActionResult<Address>> Post(Address address)
+        public async Task<ActionResult<AddressResponse>> Post(AddressRequest address)
         {
-            _context.Address.Add(address);
+            // Dto to Model:
+            Address addressModel = new Address()
+            {
+                BuyerName = address.BuyerName,
+                City = address.City,
+                Email = address.Email,
+                InUse = address.InUse,
+                Phone = address.Phone,
+                PostalCode = address.PostalCode,
+                State = address.State,
+                Street = address.Street
+            };
+            _context.Address.Add(addressModel);
             await _context.SaveChangesAsync();
-
+            address.IdAddress = addressModel.IdAddress;
             return CreatedAtAction("GetAddress", new { id = address.IdAddress }, address);
         }
 
-        public async Task<ActionResult<Address>> Delete(int id)
+        public async Task<ActionResult<AddressResponse>> Delete(int id)
         {
             var address = await _context.Address.FindAsync(id);
             if (address == null)
             {
                 return NotFound();
             }
-
             _context.Address.Remove(address);
             await _context.SaveChangesAsync();
-
-            return address;
+            // Model to Dto:
+            var addressDto = _mapper.Map<Address, AddressResponse>(address);
+            return addressDto;
         }
 
         private bool Exists(int id)

@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using ecommerce.Models;
 using ecommerce.Persistence;
 using ecommerce.Application;
+using AutoMapper;
+using ecommerce.DTOs.Response;
+using ecommerce.DTOs.Request;
 
 namespace ecommerce.Controllers
 {
@@ -11,46 +13,43 @@ namespace ecommerce.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly ContextDb _context;
-        private readonly CategoriesAction _categories;
-
-        public CategoriesController(ContextDb context)
+        private readonly CategoriesActions _categories;
+        public CategoriesController(ContextDb context,IMapper mapper)
         {
-            _context = context;
-            _categories = new CategoriesAction(_context);
+            _categories = new CategoriesActions(context, mapper);
         }
 
         // GET: api/Categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategory()
+        public async Task<ActionResult<IEnumerable<CategoryResponse>>> GetCategory()
         {
             return await _categories.Get();
         }
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> GetCategory(int id)
+        public async Task<ActionResult<CategoryResponse>> GetCategory(int id)
         {
             return await _categories.GetById(id);
         }
 
         // PUT: api/Categories/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(int id, Category category)
+        public async Task<IActionResult> PutCategory(int id, CategoryRequest category)
         {
             return await _categories.Put(id, category);
         }
 
         // POST: api/Categories
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
+        public async Task<ActionResult<CategoryResponse>> PostCategory(CategoryRequest category)
         {
             return await _categories.Post(category);
         }
 
         // DELETE: api/Categories/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Category>> DeleteCategory(int id)
+        public async Task<ActionResult<CategoryResponse>> DeleteCategory(int id)
         {
             return await _categories.Delete(id);
         }

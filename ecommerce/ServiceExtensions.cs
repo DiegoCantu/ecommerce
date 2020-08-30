@@ -6,6 +6,10 @@ using ecommerce.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.OpenApi.Models;
+using System;
+using AutoMapper;
+using ecommerce.Application;
 
 namespace ecommerce
 {
@@ -59,5 +63,32 @@ namespace ecommerce
                 };
             });
         }
+
+        public static void AddSwagger(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(options =>
+            {
+                var groupName = "v1";
+
+                options.SwaggerDoc(groupName, new OpenApiInfo
+                {
+                    Title = $"Ecommerce {groupName}",
+                    Version = groupName,
+                    Description = "Ecommerce API",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "rEact Commerce",
+                        Email = string.Empty,
+                        Url = new Uri("https://react-commerce-baa6f.web.app/"),
+                    }
+                });
+            });
+        }
+
+        public static void AddMapper(this IServiceCollection services)
+        { 
+            services.AddAutoMapper(typeof(AddressActions));
+        }
+
     }
 }

@@ -17,7 +17,7 @@ namespace ecommerce.Helper
                 issuer: GlobalVariables.JWTParameters.Issuer,
                 audience: GlobalVariables.JWTParameters.Audience,
                 claims: new List<Claim>(),
-                expires: DateTime.Now.AddDays(6),
+                expires: DateTime.Now.AddDays(2),
                 signingCredentials: signinCredentials
             );
             return new JwtSecurityTokenHandler().WriteToken(tokeOptions);

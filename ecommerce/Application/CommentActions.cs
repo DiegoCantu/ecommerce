@@ -1,4 +1,7 @@
-﻿using ecommerce.Models;
+﻿using AutoMapper;
+using ecommerce.DTOs.Request;
+using ecommerce.DTOs.Response;
+using ecommerce.Models;
 using ecommerce.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,42 +14,62 @@ namespace ecommerce.Application
     public class CommentActions : ControllerBase
     {
         private readonly ContextDb _context;
-        public CommentActions(ContextDb context)
+        private readonly IMapper _mapper;
+        public CommentActions(ContextDb context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        // GET: api/Comments
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Comment>>> Get()
+        public async Task<ActionResult<IEnumerable<CommentResponse>>> Get()
         {
-            return await _context.Comment.ToListAsync();
+            var commentModel = await _context.Comment.ToListAsync();
+            // Model to Dto:
+            var commentDto = _mapper.Map<List<Comment>, List<CommentResponse>>(commentModel);
+            return commentDto;
         }
 
-        // GET: api/Comments/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Comment>> GetById(int id)
+        public async Task<ActionResult<CommentResponse>> GetById(int id)
         {
             var comment = await _context.Comment.FindAsync(id);
-
             if (comment == null)
             {
                 return NotFound();
             }
-
-            return comment;
+            // Model to Dto:
+            var commentDto = _mapper.Map<Comment, CommentResponse>(comment);
+            return commentDto;
         }
 
-        // PUT: api/Comments/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, Comment comment)
+        public async Task<ActionResult<IEnumerable<CommentResponse>>> GetByIdProduct(int id)
+        {
+            var comment = await _context.Comment.Where(x => x.IdProduct == id).ToListAsync();
+            if (comment == null)
+            {
+                return NotFound();
+            }
+            // Model to Dto:
+            var commentDto = _mapper.Map<List<Comment>, List<CommentResponse>>(comment);
+            return commentDto;
+        }
+
+        public async Task<IActionResult> Put(int id, CommentRequest comment)
         {
             if (id != comment.IdComment)
             {
                 return BadRequest();
             }
+            // Dto to Model:
+            Comment commentModel = new Comment()
+            {
+                IdComment = comment.IdComment,
+                IdProduct = comment.IdProduct,
+                Name = comment.Name,
+                Post = comment.Post,
+                Rating = comment.Rating
 
-            _context.Entry(comment).State = EntityState.Modified;
+            };
+            _context.Entry(commentModel).State = EntityState.Modified;
 
             try
             {
@@ -67,19 +90,25 @@ namespace ecommerce.Application
             return NoContent();
         }
 
-        // POST: api/Comments
-        [HttpPost]
-        public async Task<ActionResult<Comment>> Post(Comment comment)
+        public async Task<ActionResult<CommentResponse>> Post(CommentRequest comment)
         {
-            _context.Comment.Add(comment);
-            await _context.SaveChangesAsync();
+            // Dto to Model:
+            Comment commentModel = new Comment()
+            {
+                IdProduct = comment.IdProduct,
+                Name = comment.Name,
+                Post = comment.Post,
+                Rating = comment.Rating
 
+            };
+            _context.Comment.Add(commentModel);
+            await _context.SaveChangesAsync();
+            comment.IdComment = commentModel.IdComment;
             return CreatedAtAction("GetComment", new { id = comment.IdComment }, comment);
         }
 
-        // DELETE: api/Comments/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Comment>> Delete(int id)
+
+        public async Task<ActionResult<CommentResponse>> Delete(int id)
         {
             var comment = await _context.Comment.FindAsync(id);
             if (comment == null)
@@ -89,8 +118,9 @@ namespace ecommerce.Application
 
             _context.Comment.Remove(comment);
             await _context.SaveChangesAsync();
-
-            return comment;
+            // Model to Dto:
+            var commentDto = _mapper.Map<Comment, CommentResponse>(comment);
+            return commentDto;
         }
 
         private bool Exists(int id)

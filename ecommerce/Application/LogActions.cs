@@ -15,7 +15,7 @@ namespace ecommerce.Application
             DateTime now = DateTime.Now;
             string date = now.ToString("yyyy-MM-dd");
             string sp = "CALL save_log(" +
-                "iduser => "            + log.IdUser + "," +
+                "email => '"             + log.Email + "' ," +
                 "messageexception => '" + log.MessageException.Replace("'", "") + "' ," +
                 "innerexception => '"   + log.InnerException.Replace("'","") + "' ," +
                 "stacktrace => '"       + log.StackTrace.Replace("'", "") + "'," +
@@ -31,7 +31,7 @@ namespace ecommerce.Application
             }
             catch (Exception ex)
             {
-                ELog.Save(log, ex);
+                ELog.Save(log, ex, sp);
             } 
             finally
             {

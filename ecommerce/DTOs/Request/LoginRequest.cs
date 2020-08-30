@@ -1,14 +1,14 @@
 ﻿using FluentValidation;
 
-namespace ecommerce.Models
+namespace ecommerce.DTOs.Request
 {
-    public class Login
+    public class LoginRequest
     {
         public string Email { get; set; }
         public string Password { get; set; }
     }
 
-    internal class LoginValidation : AbstractValidator<Login>
+    internal class LoginValidation : AbstractValidator<LoginRequest>
     {
         public LoginValidation()
         {
