@@ -14,8 +14,10 @@ namespace ecommerce.Models
         public string Phone { get; set; }
         public string State { get; set; }
         public string City { get; set; }
+        public string Suburb { get; set; } 
         public string Street { get; set; }
         public string PostalCode { get; set; }
+        public string Indications { get; set; } 
         public bool InUse { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
 

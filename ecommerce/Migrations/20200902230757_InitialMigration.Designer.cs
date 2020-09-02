@@ -10,7 +10,7 @@ using ecommerce.Persistence;
 namespace ecommerce.Migrations
 {
     [DbContext(typeof(ContextDb))]
-    [Migration("20200828220238_InitialMigration")]
+    [Migration("20200902230757_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,9 @@ namespace ecommerce.Migrations
                     b.Property<bool>("InUse")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Indications")
+                        .HasColumnType("text");
+
                     b.Property<string>("Phone")
                         .HasColumnType("text");
 
@@ -54,6 +57,9 @@ namespace ecommerce.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Street")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Suburb")
                         .HasColumnType("text");
 
                     b.HasKey("IdAddress");
@@ -341,7 +347,16 @@ namespace ecommerce.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("LastName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
                     b.Property<string>("Password")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SecondLastName")
                         .HasColumnType("text");
 
                     b.HasKey("Email");

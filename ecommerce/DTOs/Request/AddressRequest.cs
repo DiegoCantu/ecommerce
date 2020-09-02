@@ -10,8 +10,10 @@ namespace ecommerce.DTOs.Request
         public string Phone { get; set; }
         public string State { get; set; }
         public string City { get; set; }
+        public string Suburb { get; set; }
         public string Street { get; set; }
         public string PostalCode { get; set; }
+        public string Indications { get; set; }
         public bool InUse { get; set; }
     }
 
@@ -24,6 +26,7 @@ namespace ecommerce.DTOs.Request
             RuleFor(x => x.Phone).NotEmpty();
             RuleFor(x => x.State).NotEmpty();
             RuleFor(x => x.City).NotEmpty();
+            RuleFor(x => x.Suburb).NotEmpty();
             RuleFor(x => x.Street).NotEmpty();
             RuleFor(x => x.PostalCode).NotEmpty();
             RuleFor(x => x.InUse).NotEmpty();

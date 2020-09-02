@@ -56,6 +56,9 @@ namespace ecommerce.Migrations
                     Email = table.Column<string>(nullable: false),
                     IdUser = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    SecondLastName = table.Column<string>(nullable: true),
                     Password = table.Column<string>(nullable: true),
                     CreateDate = table.Column<DateTime>(nullable: false)
                 },
@@ -107,8 +110,10 @@ namespace ecommerce.Migrations
                     Phone = table.Column<string>(nullable: true),
                     State = table.Column<string>(nullable: true),
                     City = table.Column<string>(nullable: true),
+                    Suburb = table.Column<string>(nullable: true),
                     Street = table.Column<string>(nullable: true),
                     PostalCode = table.Column<string>(nullable: true),
+                    Indications = table.Column<string>(nullable: true),
                     InUse = table.Column<bool>(nullable: false),
                     CreateDate = table.Column<DateTime>(nullable: false)
                 },

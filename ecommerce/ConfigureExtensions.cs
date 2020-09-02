@@ -37,6 +37,7 @@ namespace ecommerce
                             TargetSite = ex.TargetSite != null ? ex.TargetSite.Name : "Empty"
                         };
                         LogActions.SaveError(log);
+                        context.Response.StatusCode = 200;
                         await context.Response.WriteAsync(JsonConvert.SerializeObject(log, Formatting.Indented));
                     }
                 });

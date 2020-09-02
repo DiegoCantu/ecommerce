@@ -28,7 +28,7 @@ namespace ecommerce.Controllers
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserResponse>> GetUser(int id)
+        public async Task<ActionResult<LoginResponse>> GetUser(int id)
         {
             return await _users.GetById(id);
         }

@@ -25,6 +25,7 @@ namespace ecommerce
             //Custom Methods:
             ServiceExtensions.AddController(services);
             ServiceExtensions.AddDbContext(services);
+            ServiceExtensions.AddCORS(services);
             ServiceExtensions.AddJWT(services);
             ServiceExtensions.AddSwagger(services);
             ServiceExtensions.AddMapper(services);

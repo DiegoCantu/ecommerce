@@ -66,7 +66,9 @@ namespace ecommerce.Application
                 Phone = address.Phone,
                 PostalCode = address.PostalCode,
                 State = address.State,
-                Street = address.Street
+                Street = address.Street,
+                Suburb = address.Suburb,
+                Indications = address.Indications
             };
             _context.Entry(addressModel).State = EntityState.Modified;
 
@@ -101,7 +103,9 @@ namespace ecommerce.Application
                 Phone = address.Phone,
                 PostalCode = address.PostalCode,
                 State = address.State,
-                Street = address.Street
+                Street = address.Street,     
+                Suburb = address.Suburb,
+                Indications = address.Indications
             };
             _context.Address.Add(addressModel);
             await _context.SaveChangesAsync();

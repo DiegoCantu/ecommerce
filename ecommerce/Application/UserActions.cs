@@ -30,16 +30,29 @@ namespace ecommerce.Application
             return userDto;
         }
 
-        public async Task<ActionResult<UserResponse>> GetById(int id)
+        public async Task<ActionResult<LoginResponse>> GetById(int id)
         {
-            var user = await _context.User.FindAsync(id);
+            var user = await _context.User.Where(x => x.IdUser == id).FirstOrDefaultAsync();
             if (user == null)
             {
                 return NotFound();
             }
-            // Model to Dto:
-            var userDto = _mapper.Map<User, UserResponse>(user);
-            return userDto;
+            LoginResponse loginResponseDto = new LoginResponse();
+            AddressActions addressActions = new AddressActions(_context, _mapper);
+            loginResponseDto.Addresses = addressActions.GetByEmail(user.Email).Result.Value;
+            CardActions cardActions = new CardActions(_context, _mapper);
+            loginResponseDto.Cards = cardActions.GetByEmail(user.Email).Result.Value;
+            CartActions cartActions = new CartActions(_context, _mapper);
+            loginResponseDto.Carts = cartActions.GetByEmail(user.Email).Result.Value;
+            PurchaseActions purchaseActions = new PurchaseActions(_context, _mapper);
+            loginResponseDto.Purchases = purchaseActions.GetByEmail(user.Email).Result.Value;
+            loginResponseDto.JWT = JWT.GetToken();
+            loginResponseDto.Email = user.Email;
+            loginResponseDto.Name = user.Name;
+            loginResponseDto.LastName = user.LastName;
+            loginResponseDto.SecondLastName = user.SecondLastName;
+
+            return loginResponseDto;
         }
 
         public async Task<IActionResult> Put(int id, UserRequest user)
@@ -51,7 +64,9 @@ namespace ecommerce.Application
             User userModel = new User()
             {
                 IdUser = user.IdUser,
-                Password = user.Password
+                Name = user.Name,
+                LastName = user.LastName,
+                SecondLastName = user.SecondLastName,
             };
             _context.Entry(userModel).State = EntityState.Modified;
 
@@ -79,13 +94,18 @@ namespace ecommerce.Application
             user.Password = Cryptography.HashPassword(user.Password);
             User userModel = new User()
             {
+                Name = user.Name,
+                LastName = user.LastName,
+                SecondLastName = user.SecondLastName,
                 Email = user.Email,
                 Password = user.Password
             };
             _context.User.Add(userModel);
             await _context.SaveChangesAsync();
             user.IdUser = userModel.IdUser;
-            return CreatedAtAction("GetUser", new { id = user.IdUser }, user);
+            // Model to Response:
+            var userDto = _mapper.Map<User, UserResponse>(userModel);
+            return CreatedAtAction("GetUser", new { id = userDto.IdUser }, userDto);
         }
 
         public async Task<ActionResult<UserResponse>> Delete(int id)
@@ -100,7 +120,7 @@ namespace ecommerce.Application
             await _context.SaveChangesAsync();
             // Model to Dto:
             var userDto = _mapper.Map<User, UserResponse>(user);
-            return userDto;
+            return Ok(userDto);
         }
 
         private bool Exists(int id)
@@ -114,10 +134,10 @@ namespace ecommerce.Application
             {
                 return BadRequest("Solicitud de cliente no válida");
             }
-            string dbpass = await _context.User.Where(x => x.Email == login.Email).Select(x => x.Password).FirstOrDefaultAsync();
-            if (!string.IsNullOrEmpty(dbpass))
+            var dbpass = await _context.User.Where(x => x.Email == login.Email).FirstOrDefaultAsync();
+            if (dbpass != null)
             {
-                if (Cryptography.VerifyPassword(dbpass, login.Password))
+                if (Cryptography.VerifyPassword(dbpass.Password, login.Password))
                 {
                     LoginResponse loginResponseDto = new LoginResponse();
                     AddressActions addressActions = new AddressActions(_context,_mapper);
@@ -129,6 +149,9 @@ namespace ecommerce.Application
                     PurchaseActions purchaseActions = new PurchaseActions(_context, _mapper);
                     loginResponseDto.Purchases = purchaseActions.GetByEmail(login.Email).Result.Value;
                     loginResponseDto.JWT = JWT.GetToken();
+                    loginResponseDto.Name = dbpass.Name;
+                    loginResponseDto.LastName = dbpass.LastName;
+                    loginResponseDto.SecondLastName = dbpass.SecondLastName;
                     return Ok(loginResponseDto);
                 }
                 else
