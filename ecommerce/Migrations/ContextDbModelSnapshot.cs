@@ -69,10 +69,11 @@ namespace ecommerce.Migrations
 
             modelBuilder.Entity("ecommerce.Models.Card", b =>
                 {
-                    b.Property<int>("IdCard")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NumberCard")
+                        .HasColumnType("text");
 
                     b.Property<string>("CardName")
                         .HasColumnType("text");
@@ -80,24 +81,21 @@ namespace ecommerce.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
                     b.Property<string>("ExpireDate")
                         .HasColumnType("text");
+
+                    b.Property<int>("IdCard")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                     b.Property<bool>("InUse")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("NumberCard")
-                        .HasColumnType("text");
-
                     b.Property<string>("UsernameCard")
                         .HasColumnType("text");
 
-                    b.HasKey("IdCard");
-
-                    b.HasIndex("Email");
+                    b.HasKey("Email", "NumberCard");
 
                     b.ToTable("Card");
                 });
@@ -373,7 +371,9 @@ namespace ecommerce.Migrations
                 {
                     b.HasOne("ecommerce.Models.User", "User")
                         .WithMany("Card")
-                        .HasForeignKey("Email");
+                        .HasForeignKey("Email")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ecommerce.Models.Cart", b =>

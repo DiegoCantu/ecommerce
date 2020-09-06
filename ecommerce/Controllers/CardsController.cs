@@ -27,17 +27,17 @@ namespace ecommerce.Controllers
         }
 
         // GET: api/Cards/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<CardResponse>> GetCard(int id)
+        [HttpGet("{email}/{numberCard}")]
+        public async Task<ActionResult<CardResponse>> GetCard(string email, string numberCard)
         {
-            return await _cards.GetById(id);
+            return await _cards.GetById(email, numberCard);
         }
 
         // PUT: api/Cards/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCard(int id, CardRequest card)
         {
-            return await _cards.Put(id, card);
+            return await _cards.Put(id,card);
         }
 
         // POST: api/Cards
@@ -48,10 +48,10 @@ namespace ecommerce.Controllers
         }
 
         // DELETE: api/Cards/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<CardResponse>> DeleteCard(int id)
+        [HttpDelete("{Email}/{numberCard}")]
+        public async Task<ActionResult<CardResponse>> DeleteCard(string email, string numberCard)
         {
-            return await _cards.Delete(id);
+            return await _cards.Delete(email, numberCard);
         }
     }
 }

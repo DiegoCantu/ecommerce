@@ -47,6 +47,7 @@ namespace ecommerce.Application
             PurchaseActions purchaseActions = new PurchaseActions(_context, _mapper);
             loginResponseDto.Purchases = purchaseActions.GetByEmail(user.Email).Result.Value;
             loginResponseDto.JWT = JWT.GetToken();
+            loginResponseDto.IdUser = user.IdUser;
             loginResponseDto.Email = user.Email;
             loginResponseDto.Name = user.Name;
             loginResponseDto.LastName = user.LastName;
@@ -148,6 +149,7 @@ namespace ecommerce.Application
                     loginResponseDto.Carts = cartActions.GetByEmail(login.Email).Result.Value;
                     PurchaseActions purchaseActions = new PurchaseActions(_context, _mapper);
                     loginResponseDto.Purchases = purchaseActions.GetByEmail(login.Email).Result.Value;
+                    loginResponseDto.IdUser = dbpass.IdUser;
                     loginResponseDto.JWT = JWT.GetToken();
                     loginResponseDto.Name = dbpass.Name;
                     loginResponseDto.LastName = dbpass.LastName;

@@ -9,6 +9,10 @@ namespace ecommerce.Persistence
         {
             modelBuilder.HasDefaultSchema("public");
 
+            //Composite Key:
+            modelBuilder.Entity<Card>()
+            .HasKey(k => new { k.Email, k.NumberCard });
+
             // [ Entity Relationship:
 
             // { User email foreign keys 1:N

@@ -134,26 +134,26 @@ namespace ecommerce.Migrations
                 schema: "public",
                 columns: table => new
                 {
+                    Email = table.Column<string>(nullable: false),
+                    NumberCard = table.Column<string>(nullable: false),
                     IdCard = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Email = table.Column<string>(nullable: true),
                     CardName = table.Column<string>(nullable: true),
                     UsernameCard = table.Column<string>(nullable: true),
-                    NumberCard = table.Column<string>(nullable: true),
                     ExpireDate = table.Column<string>(nullable: true),
                     InUse = table.Column<bool>(nullable: false),
                     CreateDate = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Card", x => x.IdCard);
+                    table.PrimaryKey("PK_Card", x => new { x.Email, x.NumberCard });
                     table.ForeignKey(
                         name: "FK_Card_User_Email",
                         column: x => x.Email,
                         principalSchema: "public",
                         principalTable: "User",
                         principalColumn: "Email",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -291,12 +291,6 @@ namespace ecommerce.Migrations
                 name: "IX_Address_Email",
                 schema: "public",
                 table: "Address",
-                column: "Email");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Card_Email",
-                schema: "public",
-                table: "Card",
                 column: "Email");
 
             migrationBuilder.CreateIndex(

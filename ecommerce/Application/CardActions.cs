@@ -43,9 +43,9 @@ namespace ecommerce.Application
             return cardDtos;
         }
 
-        public async Task<ActionResult<CardResponse>> GetById(int id)
+        public async Task<ActionResult<CardResponse>> GetById(string Email, string NumberCard)
         {
-            var card = await _context.Card.FindAsync(id);
+            var card = await _context.Card.Where(c => c.Email == Email && c.NumberCard == NumberCard).FirstOrDefaultAsync();
             if (card == null)
             {
                 return NotFound();
@@ -96,11 +96,11 @@ namespace ecommerce.Application
             Card cardModel = new Card()
             {
                 IdCard = card.IdCard,
-                CardName = card.CardName,
                 Email = card.Email,
+                NumberCard = card.NumberCard,
+                CardName = card.CardName,
                 ExpireDate = card.ExpireDate,
                 InUse = card.InUse,
-                NumberCard = card.NumberCard,
                 UsernameCard = card.UsernameCard,
             };
             _context.Entry(cardModel).State = EntityState.Modified;
@@ -142,9 +142,9 @@ namespace ecommerce.Application
             return CreatedAtAction("GetCard", new { id = card.IdCard }, card);
         }
 
-        public async Task<ActionResult<CardResponse>> Delete(int id)
+        public async Task<ActionResult<CardResponse>> Delete(string Email, string NumberCard)
         {
-            var card = await _context.Card.FindAsync(id);
+            var card = await _context.Card.FindAsync(Email, NumberCard);
             if (card == null)
             {
                 return NotFound();

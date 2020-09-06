@@ -4,6 +4,7 @@ namespace ecommerce.DTOs.Response
 {
     public class LoginResponse
     {
+        public int IdUser { get; set; }  
         public string Name { get; set; }
         public string LastName { get; set; }
         public string SecondLastName { get; set; }
